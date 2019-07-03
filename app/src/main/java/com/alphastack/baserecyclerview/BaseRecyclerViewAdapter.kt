@@ -3,11 +3,11 @@ package com.alphastack.baserecyclerview
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.alphastack.baserecyclerview.model.BugTrackerObject
 import com.alphastack.baserecyclerview.model.DataNotFoundItem
-import com.alphastack.baserecyclerview.model.RecyclerViewItem
 
-abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseViewHolder<ItemType>> :
-    RecyclerView.Adapter<BaseViewHolder<*>>() {
+abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseViewHolder<ItemType>> :
+        RecyclerView.Adapter<BaseViewHolder<*>>() {
 
     companion object {
         private const val ITEM_TYPE_DATA_NOT_FOUND = 111
@@ -17,7 +17,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      * Holds items.
      */
-    private val items = mutableListOf<RecyclerViewItem>()
+    private val items = mutableListOf<BugTrackerObject>()
 
     /**
      *
@@ -44,7 +44,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
 
         if (viewType == ITEM_TYPE_DATA_NOT_FOUND) {
             val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_data_not_found_item, parent, false)
+                    LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_data_not_found_item, parent, false)
             viewHolder = DataNotFoundViewHolder(view)
         } else {
             viewHolder = getViewHolder(LayoutInflater.from(parent.context), parent)
@@ -84,10 +84,83 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    fun replaceData(items: List<RecyclerViewItem>) {
+    fun replaceData(items: List<BugTrackerObject>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
+    }
+
+    /**
+     *
+     */
+    fun addItem(item: BugTrackerObject) {
+        val indexToInsert = itemCount
+        this.items.add(indexToInsert, item)
+        this.notifyItemInserted(indexToInsert)
+    }
+
+    /**
+     *
+     */
+    fun removeItem(item: BugTrackerObject) {
+        val index = getItemIndex(item)
+        if (index != -1) {
+            this.items.removeAt(index)
+            notifyItemRemoved(index)
+            checkForDataNotFoundState()
+        }
+    }
+
+    /**
+     *
+     */
+    fun updateItem(item: BugTrackerObject) {
+        val index = getItemIndex(item)
+        if (index != -1) {
+            this.items[index] = item
+            notifyItemChanged(index)
+        }
+    }
+
+    /**
+     * This will return item from index or return null.
+     */
+    fun getItem(index: Int): BugTrackerObject? {
+        // Return null if index is out of bound
+        if (index < 0 || index > this.items.size - 1) {
+            return null
+        }
+
+        // If item is type DataNotFoundItem, then it will throw an exception.
+        return this.items[index]
+    }
+
+
+    /**
+     * This will check if there are more items in list or not.
+     * If not, it will show data not found state.
+     */
+    private fun checkForDataNotFoundState() {
+        if (this.items.isEmpty()) {
+            showDataNotFoundMessage("Data not found.")
+        }
+    }
+
+    /**
+     * If item is available in list, this will return index of that item.
+     * Else it will return -1.
+     */
+    private fun getItemIndex(item: BugTrackerObject): Int {
+        var resultIndex = -1
+
+        for ((index, obj) in items.withIndex()) {
+            if (obj.id == item.id) {
+                resultIndex = index
+                break
+            }
+        }
+
+        return resultIndex
     }
 
     /**
