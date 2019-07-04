@@ -208,7 +208,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
 
 
     /**
-     * This method is called before bining item.
+     * This method is called before binding item.
      * Override this method for setting margin for inflated view.
      */
     open fun aboutToBindViewHolder(viewHolder: VH, position: Int) {

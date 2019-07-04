@@ -18,16 +18,16 @@ class LeagueListAdapter : BaseRecyclerViewAdapter<League, LeagueListAdapter.Leag
     }
 
     override fun aboutToBindViewHolder(viewHolder: LeagueListItemViewHolder, position: Int) {
-        // Set margin bottom for last item
+        // Set margin top for first item.
         val lastItem = position == itemCount - 1
         val layoutParams = viewHolder.itemView.layoutParams as RecyclerView.LayoutParams
         layoutParams.marginStart = 30
         layoutParams.marginEnd = 30
-        layoutParams.topMargin = 30
-        if (lastItem) {
-            layoutParams.bottomMargin = 30
+        layoutParams.bottomMargin = 30
+        if (position == 0) {
+            layoutParams.topMargin = 30
         } else {
-            layoutParams.bottomMargin = 0
+            layoutParams.topMargin = 0
         }
         viewHolder.itemView.layoutParams = layoutParams
     }
