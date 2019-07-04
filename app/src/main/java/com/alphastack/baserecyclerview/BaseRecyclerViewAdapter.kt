@@ -25,8 +25,16 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
             is DataNotFoundItem -> ITEM_TYPE_DATA_NOT_FOUND
-            else -> ITEM_TYPE_DATA
+            else -> getViewType(position)
         }
+    }
+
+    /**
+     * Override this method if child Adapter has multiple
+     * view types.
+     */
+    open fun getViewType(position: Int): Int {
+        return ITEM_TYPE_DATA
     }
 
     /**
@@ -45,6 +53,15 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
         if (viewType == ITEM_TYPE_DATA_NOT_FOUND) {
             val view =
                     LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_data_not_found_item, parent, false)
+
+            // Set Height & Width to MATCH_PARENT
+            parent.post {
+                val layoutParams = view.layoutParams as RecyclerView.LayoutParams
+                layoutParams.width = parent.width
+                layoutParams.height = parent.height
+                view.layoutParams = layoutParams
+            }
+
             viewHolder = DataNotFoundViewHolder(view)
         } else {
             viewHolder = getViewHolder(LayoutInflater.from(parent.context), parent)
@@ -60,7 +77,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         val itemType = getItemViewType(position)
 
-        if (itemType == ITEM_TYPE_DATA) {
+        if (itemType ==  getViewType(position)) {
             val item = items[position] as ItemType
             val viewHolder = holder as VH
             viewHolder.bind(item)
@@ -74,6 +91,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     /**
      *
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun showDataNotFoundMessage(message: String) {
         val item = DataNotFoundItem(message)
         this.items.clear()
@@ -93,7 +111,30 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     /**
      *
      */
+    fun appendData(items: List<BugTrackerObject>) {
+        val startIndex = itemCount
+        this.items.addAll(startIndex, items)
+        notifyItemRangeInserted(startIndex, items.size)
+    }
+
+    /**
+     *
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun clearData() {
+        this.items.clear()
+        notifyDataSetChanged()
+    }
+
+    /**
+     *
+     */
     fun addItem(item: BugTrackerObject) {
+        // Remove DataNotFoundItem if previous data was empty
+        if(this.items.size == 1 && getItem(0) is DataNotFoundItem) {
+            clearData()
+        }
+        // Add item
         val indexToInsert = itemCount
         this.items.add(indexToInsert, item)
         this.notifyItemInserted(indexToInsert)
@@ -125,6 +166,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     /**
      * This will return item from index or return null.
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun getItem(index: Int): BugTrackerObject? {
         // Return null if index is out of bound
         if (index < 0 || index > this.items.size - 1) {
@@ -134,7 +176,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
         // If item is type DataNotFoundItem, then it will throw an exception.
         return this.items[index]
     }
-
 
     /**
      * This will check if there are more items in list or not.
