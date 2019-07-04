@@ -57,8 +57,8 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
             // Set Height & Width to MATCH_PARENT
             parent.post {
                 val layoutParams = view.layoutParams as RecyclerView.LayoutParams
-                layoutParams.width = parent.width
-                layoutParams.height = parent.height
+                layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
+                layoutParams.height = RecyclerView.LayoutParams.MATCH_PARENT
                 view.layoutParams = layoutParams
             }
 
@@ -77,9 +77,10 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         val itemType = getItemViewType(position)
 
-        if (itemType ==  getViewType(position)) {
+        if (itemType == getViewType(position)) {
             val item = items[position] as ItemType
             val viewHolder = holder as VH
+            aboutToBindViewHolder(viewHolder, position)
             viewHolder.bind(item)
         } else if (itemType == ITEM_TYPE_DATA_NOT_FOUND && holder is DataNotFoundViewHolder) {
             val item = items[position] as DataNotFoundItem
@@ -87,6 +88,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
         }
 
     }
+
 
     /**
      *
@@ -131,7 +133,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
      */
     fun addItem(item: BugTrackerObject) {
         // Remove DataNotFoundItem if previous data was empty
-        if(this.items.size == 1 && getItem(0) is DataNotFoundItem) {
+        if (this.items.size == 1 && getItem(0) is DataNotFoundItem) {
             clearData()
         }
         // Add item
@@ -202,6 +204,15 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
         }
 
         return resultIndex
+    }
+
+
+    /**
+     * This method is called before bining item.
+     * Override this method for setting margin for inflated view.
+     */
+    open fun aboutToBindViewHolder(viewHolder: VH, position: Int) {
+        // No operation
     }
 
     /**

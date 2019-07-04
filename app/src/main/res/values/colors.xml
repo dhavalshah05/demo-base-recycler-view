@@ -3,4 +3,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="colorTextPrimary">#fff</color>
+
+    <color name="colorLeagueItemBackground">#607D8B</color>
 </resources>
