@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alphastack.baserecyclerview.model.BugTrackerObject
 import com.alphastack.baserecyclerview.model.DataNotFoundItem
+import java.util.*
 
 abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseViewHolder<ItemType>> :
         RecyclerView.Adapter<BaseViewHolder<*>>() {
@@ -122,6 +123,15 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     /**
      *
      */
+    fun appendData(index: Int, items: List<BugTrackerObject>) {
+        this.items.addAll(index, items)
+        notifyItemRangeInserted(index, items.size)
+    }
+
+
+    /**
+     *
+     */
     @Suppress("MemberVisibilityCanBePrivate")
     fun clearData() {
         this.items.clear()
@@ -166,6 +176,37 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     }
 
     /**
+     *
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun getItems(): List<ItemType> {
+        val items = mutableListOf<ItemType>()
+        for (item in this.items) {
+            if (item !is DataNotFoundItem) {
+                items.add(item as ItemType)
+            }
+        }
+        return Collections.unmodifiableList(items)
+    }
+
+    /**
+     *
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun getItemById(id: Long): ItemType? {
+        var item: ItemType? = null
+
+        for (obj in items) {
+            if (obj.id == id) {
+                item = obj as ItemType
+                break
+            }
+        }
+
+        return item
+    }
+
+    /**
      * This will return item from index or return null.
      */
     @Suppress("MemberVisibilityCanBePrivate")
@@ -175,7 +216,10 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
             return null
         }
 
-        // If item is type DataNotFoundItem, then it will throw an exception.
+        /*
+        * We cannot return ItemType because if item is type of DataNotFoundItem,
+        * then it will throw an exception.
+        * */
         return this.items[index]
     }
 
