@@ -5,14 +5,20 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alphastack.baserecyclerview.model.BugTrackerObject
 import com.alphastack.baserecyclerview.model.DataNotFoundItem
+import com.alphastack.baserecyclerview.model.LoadingItem
 import java.util.*
 
 abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseViewHolder<ItemType>> :
         RecyclerView.Adapter<BaseViewHolder<*>>() {
 
+    interface LoadMoreDataListener {
+        fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?)
+    }
+
     companion object {
         private const val ITEM_TYPE_DATA_NOT_FOUND = 111
         private const val ITEM_TYPE_DATA = 222
+        private const val ITEM_TYPE_LOADING = 333
     }
 
     /**
@@ -21,11 +27,46 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     private val items = mutableListOf<BugTrackerObject>()
 
     /**
+     * Holds scroll listener.
+     */
+    private var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener? = null
+
+    /**
+     * Holds reference of RecyclerView to attach ScrollListener
+     */
+    private var recyclerView: RecyclerView? = null
+
+    /**
+     *
+     */
+    private var loadMoreDataListener: LoadMoreDataListener? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+
+        endlessRecyclerViewScrollListener = object : EndlessRecyclerViewScrollListener(recyclerView.layoutManager) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                view?.post {
+                    this@BaseRecyclerViewAdapter.loadMoreDataListener?.onLoadMore(page, totalItemsCount, view)
+                }
+            }
+        }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        this.recyclerView = null
+        endlessRecyclerViewScrollListener = null
+    }
+
+    /**
      *
      */
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
             is DataNotFoundItem -> ITEM_TYPE_DATA_NOT_FOUND
+            is LoadingItem -> ITEM_TYPE_LOADING
             else -> getViewType(position)
         }
     }
@@ -64,6 +105,12 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
             }
 
             viewHolder = DataNotFoundViewHolder(view)
+        } else if (viewType == ITEM_TYPE_LOADING) {
+
+            val view =
+                    LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_loading_item, parent, false)
+            viewHolder = LoadingItemViewHolder(view)
+
         } else {
             viewHolder = getViewHolder(LayoutInflater.from(parent.context), parent)
         }
@@ -86,8 +133,15 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
         } else if (itemType == ITEM_TYPE_DATA_NOT_FOUND && holder is DataNotFoundViewHolder) {
             val item = items[position] as DataNotFoundItem
             holder.bind(item)
+        } else if (itemType == ITEM_TYPE_LOADING && holder is LoadingItemViewHolder) {
+            val item = items[position] as LoadingItem
+            holder.bind(item)
         }
 
+    }
+
+    fun setLoadMoreDataListener(listener: LoadMoreDataListener) {
+        this.loadMoreDataListener = listener
     }
 
 
@@ -96,36 +150,87 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun showDataNotFoundMessage(message: String) {
+        clearData()
+
         val item = DataNotFoundItem(message)
-        this.items.clear()
         this.items.add(item)
         notifyDataSetChanged()
+
+        removeEndlessScrollListener()
+    }
+
+    /**
+     *
+     */
+    fun showLoading() {
+        val loadingItem = LoadingItem()
+        loadingItem.id = -1L
+
+        if (items.isEmpty()) {
+            clearData()
+            this.items.add(loadingItem)
+            notifyDataSetChanged()
+        } else {
+            if (itemCount == 1 && items[0] is DataNotFoundItem) {
+                clearData()
+                this.items.add(loadingItem)
+                notifyDataSetChanged()
+            } else {
+                val indexToInsert = itemCount
+                this.items.add(indexToInsert, loadingItem)
+                this.notifyItemInserted(indexToInsert)
+            }
+        }
+
+        removeEndlessScrollListener()
+    }
+
+    /**
+     *
+     */
+    fun hideLoading() {
+        removeLoadingItem()
+        addEndlessScrollListener()
     }
 
     /**
      *
      */
     fun replaceData(items: List<BugTrackerObject>) {
-        this.items.clear()
+        clearData()
+
         this.items.addAll(items)
         notifyDataSetChanged()
+
+        addEndlessScrollListener()
     }
 
     /**
      *
      */
     fun appendData(items: List<BugTrackerObject>) {
+        removeLoadingItem()
+        removeDataNotFoundItem()
+
         val startIndex = itemCount
         this.items.addAll(startIndex, items)
         notifyItemRangeInserted(startIndex, items.size)
+
+        addEndlessScrollListener()
     }
+
 
     /**
      *
      */
     fun appendData(index: Int, items: List<BugTrackerObject>) {
+        removeLoadingItem()
+        removeDataNotFoundItem()
+
         this.items.addAll(index, items)
         notifyItemRangeInserted(index, items.size)
+
+        addEndlessScrollListener()
     }
 
 
@@ -135,6 +240,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     @Suppress("MemberVisibilityCanBePrivate")
     fun clearData() {
         this.items.clear()
+        this.endlessRecyclerViewScrollListener?.resetState()
         notifyDataSetChanged()
     }
 
@@ -142,14 +248,15 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
      *
      */
     fun addItem(item: BugTrackerObject) {
-        // Remove DataNotFoundItem if previous data was empty
-        if (this.items.size == 1 && getItem(0) is DataNotFoundItem) {
-            clearData()
-        }
+        removeLoadingItem()
+        removeDataNotFoundItem()
+
         // Add item
         val indexToInsert = itemCount
         this.items.add(indexToInsert, item)
         this.notifyItemInserted(indexToInsert)
+
+        addEndlessScrollListener()
     }
 
     /**
@@ -182,7 +289,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
     fun getItems(): List<ItemType> {
         val items = mutableListOf<ItemType>()
         for (item in this.items) {
-            if (item !is DataNotFoundItem) {
+            if (item !is DataNotFoundItem && item !is LoadingItem) {
                 items.add(item as ItemType)
             }
         }
@@ -221,6 +328,47 @@ abstract class BaseRecyclerViewAdapter<ItemType : BugTrackerObject, VH : BaseVie
         * then it will throw an exception.
         * */
         return this.items[index]
+    }
+
+    /**
+     *
+     */
+    private fun addEndlessScrollListener() {
+        if (recyclerView != null && endlessRecyclerViewScrollListener != null) {
+            recyclerView!!.removeOnScrollListener(endlessRecyclerViewScrollListener!!)
+            recyclerView!!.addOnScrollListener(endlessRecyclerViewScrollListener!!)
+        }
+    }
+
+    /**
+     *
+     */
+    private fun removeEndlessScrollListener() {
+        if (recyclerView != null && endlessRecyclerViewScrollListener != null) {
+            recyclerView!!.removeOnScrollListener(endlessRecyclerViewScrollListener!!)
+        }
+    }
+
+    /**
+     *
+     */
+    private fun removeLoadingItem() {
+        if (this.items.isNotEmpty() && this.items.last() is LoadingItem) {
+            val itemIndex = itemCount - 1
+            this.items.removeAt(itemIndex)
+            notifyItemRemoved(itemIndex)
+        }
+    }
+
+    /**
+     *
+     */
+    private fun removeDataNotFoundItem() {
+        if (this.items.isNotEmpty() && this.items.last() is DataNotFoundItem) {
+            val itemIndex = itemCount - 1
+            this.items.removeAt(itemIndex)
+            notifyItemRemoved(itemIndex)
+        }
     }
 
     /**
