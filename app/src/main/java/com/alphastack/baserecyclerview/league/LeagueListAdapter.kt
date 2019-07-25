@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.alphastack.baserecyclerview.BaseRecyclerViewAdapter
-import com.alphastack.baserecyclerview.BaseViewHolder
 import com.alphastack.baserecyclerview.R
 import com.alphastack.baserecyclerview.model.League
+import com.alphastack.superadapter.BaseRecyclerViewAdapter
+import com.alphastack.superadapter.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.league_list_item.view.*
 
 class LeagueListAdapter : BaseRecyclerViewAdapter<League, LeagueListAdapter.LeagueListItemViewHolder>() {

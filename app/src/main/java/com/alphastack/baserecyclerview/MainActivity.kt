@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alphastack.baserecyclerview.league.LeagueListAdapter
 import com.alphastack.baserecyclerview.model.League
+import com.alphastack.superadapter.BaseRecyclerViewAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), BaseRecyclerViewAdapter.LoadMoreDataListener {

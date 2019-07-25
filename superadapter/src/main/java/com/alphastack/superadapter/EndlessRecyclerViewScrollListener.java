@@ -1,4 +1,4 @@
-package com.alphastack.baserecyclerview;
+package com.alphastack.superadapter;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
