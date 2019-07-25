@@ -12,7 +12,7 @@ import com.alphastack.superadapter.viewholder.LoadingItemViewHolder
 import java.util.*
 
 abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseViewHolder<ItemType>> :
-    RecyclerView.Adapter<BaseViewHolder<*>>() {
+        RecyclerView.Adapter<BaseViewHolder<*>>() {
 
     interface LoadMoreDataListener {
         fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?)
@@ -44,9 +44,14 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
      */
     private var loadMoreDataListener: LoadMoreDataListener? = null
 
+    private var recyclerViewHeight: Int = 0
+    private var recyclerViewWidth: Int = 0
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         this.recyclerView = recyclerView
+        this.recyclerViewHeight = recyclerView.height
+        this.recyclerViewWidth = recyclerView.width
 
         endlessRecyclerViewScrollListener = object : EndlessRecyclerViewScrollListener(recyclerView.layoutManager) {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
@@ -97,7 +102,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
 
         if (viewType == ITEM_TYPE_DATA_NOT_FOUND) {
             val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_data_not_found_item, parent, false)
+                    LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_data_not_found_item, parent, false)
 
             // Set Height & Width to MATCH_PARENT
             parent.post {
@@ -111,7 +116,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
         } else if (viewType == ITEM_TYPE_LOADING) {
 
             val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_loading_item, parent, false)
+                    LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_loading_item, parent, false)
             viewHolder = LoadingItemViewHolder(view)
 
         } else {
@@ -137,6 +142,18 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
             val item = items[position] as RecyclerViewDataNotFoundItem
             holder.bind(item)
         } else if (itemType == ITEM_TYPE_LOADING && holder is LoadingItemViewHolder) {
+
+            // Set LoadingItem size
+            val layoutParams = holder.itemView.layoutParams as RecyclerView.LayoutParams
+            if (recyclerViewHeight != 0 && recyclerViewWidth != 0 && getItems().isEmpty()) {
+                layoutParams.width = recyclerViewWidth
+                layoutParams.height = recyclerViewHeight
+            } else {
+                layoutParams.width = recyclerViewWidth
+                layoutParams.height = holder.itemView.context.resources.getDimension(R.dimen.recycler_view_loading_item_height).toInt()
+            }
+            holder.itemView.layoutParams = layoutParams
+
             val item = items[position] as RecyclerViewLoadingItem
             holder.bind(item)
         }

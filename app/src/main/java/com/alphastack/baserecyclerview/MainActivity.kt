@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity(), BaseRecyclerViewAdapter.LoadMoreDataLi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         adapter = LeagueListAdapter()
         layoutManager = LinearLayoutManager(this)
         setUpRecyclerViewLeagueList()
@@ -40,9 +41,11 @@ class MainActivity : AppCompatActivity(), BaseRecyclerViewAdapter.LoadMoreDataLi
     }
 
     private fun setUpRecyclerViewLeagueList() {
-        recyclerViewLeagueList.layoutManager = layoutManager
-        recyclerViewLeagueList.adapter = adapter
-        adapter.setLoadMoreDataListener(this)
+        recyclerViewLeagueList.post {
+            recyclerViewLeagueList.layoutManager = layoutManager
+            recyclerViewLeagueList.adapter = adapter
+            adapter.setLoadMoreDataListener(this@MainActivity)
+        }
     }
 
     var count = 0
