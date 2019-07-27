@@ -120,7 +120,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
             viewHolder = LoadingItemViewHolder(view)
 
         } else {
-            viewHolder = getViewHolder(LayoutInflater.from(parent.context), parent)
+            viewHolder = getViewHolder(LayoutInflater.from(parent.context), parent, viewType)
         }
 
         return viewHolder
@@ -149,7 +149,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
                 layoutParams.width = recyclerViewWidth
                 layoutParams.height = recyclerViewHeight
             } else {
-                layoutParams.width = recyclerViewWidth
+                layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
                 layoutParams.height = holder.itemView.context.resources.getDimension(R.dimen.recycler_view_loading_item_height).toInt()
             }
             holder.itemView.layoutParams = layoutParams
@@ -432,6 +432,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    abstract fun getViewHolder(inflater: LayoutInflater, parent: ViewGroup): VH
+    abstract fun getViewHolder(inflater: LayoutInflater, parent: ViewGroup, viewType: Int): VH
 
 }

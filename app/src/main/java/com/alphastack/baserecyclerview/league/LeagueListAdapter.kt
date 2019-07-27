@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.league_list_item.view.*
 
 class LeagueListAdapter : BaseRecyclerViewAdapter<League, LeagueListAdapter.LeagueListItemViewHolder>() {
 
-    override fun getViewHolder(inflater: LayoutInflater, parent: ViewGroup): LeagueListItemViewHolder {
+    override fun getViewHolder(inflater: LayoutInflater, parent: ViewGroup, viewType: Int): LeagueListItemViewHolder {
         val view = inflater.inflate(R.layout.league_list_item, parent, false)
         return LeagueListItemViewHolder(view)
     }
