@@ -1,4 +1,4 @@
-package com.alphastack.superadapter;
+package com.alphastack.superadapter.scrolllistener;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;

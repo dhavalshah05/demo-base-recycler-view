@@ -14,9 +14,6 @@ import java.util.*
 abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseViewHolder<ItemType>> :
         RecyclerView.Adapter<BaseViewHolder<*>>() {
 
-    interface LoadMoreDataListener {
-        fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?)
-    }
 
     companion object {
         private const val ITEM_TYPE_DATA_NOT_FOUND = 111
@@ -29,44 +26,15 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
      */
     private val items = mutableListOf<RecyclerViewItem>()
 
-    /**
-     * Holds scroll listener.
-     */
-    private var endlessRecyclerViewScrollListener: EndlessRecyclerViewScrollListener? = null
-
-    /**
-     * Holds reference of RecyclerView to attach ScrollListener
-     */
-    private var recyclerView: RecyclerView? = null
-
-    /**
-     *
-     */
-    private var loadMoreDataListener: LoadMoreDataListener? = null
 
     private var recyclerViewHeight: Int = 0
     private var recyclerViewWidth: Int = 0
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
         this.recyclerViewHeight = recyclerView.height
         this.recyclerViewWidth = recyclerView.width
-
-        endlessRecyclerViewScrollListener = object : EndlessRecyclerViewScrollListener(recyclerView.layoutManager) {
-            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                view?.post {
-                    this@BaseRecyclerViewAdapter.loadMoreDataListener?.onLoadMore(page, totalItemsCount, view)
-                }
-            }
-        }
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        this.recyclerView = null
-        endlessRecyclerViewScrollListener = null
-    }
+   }
 
     /**
      *
@@ -163,14 +131,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    fun setLoadMoreDataListener(listener: LoadMoreDataListener) {
-        this.loadMoreDataListener = listener
-    }
-
-
-    /**
-     *
-     */
     @Suppress("MemberVisibilityCanBePrivate")
     fun showDataNotFoundMessage(message: String) {
         clearData()
@@ -178,8 +138,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
         val item = RecyclerViewDataNotFoundItem(message)
         this.items.add(item)
         notifyDataSetChanged()
-
-        removeEndlessScrollListener()
     }
 
     /**
@@ -203,8 +161,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
                 this.notifyItemInserted(indexToInsert)
             }
         }
-
-        removeEndlessScrollListener()
     }
 
     /**
@@ -212,7 +168,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
      */
     fun hideLoading() {
         removeLoadingItem()
-        addEndlessScrollListener()
     }
 
     /**
@@ -223,8 +178,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
 
         this.items.addAll(items)
         notifyDataSetChanged()
-
-        addEndlessScrollListener()
     }
 
     /**
@@ -237,8 +190,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
         val startIndex = itemCount
         this.items.addAll(startIndex, items)
         notifyItemRangeInserted(startIndex, items.size)
-
-        addEndlessScrollListener()
     }
 
 
@@ -251,8 +202,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
 
         this.items.addAll(index, items)
         notifyItemRangeInserted(index, items.size)
-
-        addEndlessScrollListener()
     }
 
 
@@ -262,7 +211,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     @Suppress("MemberVisibilityCanBePrivate")
     fun clearData() {
         this.items.clear()
-        this.endlessRecyclerViewScrollListener?.resetState()
         notifyDataSetChanged()
     }
 
@@ -277,8 +225,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
         val indexToInsert = itemCount
         this.items.add(indexToInsert, item)
         this.notifyItemInserted(indexToInsert)
-
-        addEndlessScrollListener()
     }
 
     /**
@@ -350,25 +296,6 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
         * then it will throw an exception.
         * */
         return this.items[index]
-    }
-
-    /**
-     *
-     */
-    private fun addEndlessScrollListener() {
-        if (recyclerView != null && endlessRecyclerViewScrollListener != null) {
-            recyclerView!!.removeOnScrollListener(endlessRecyclerViewScrollListener!!)
-            recyclerView!!.addOnScrollListener(endlessRecyclerViewScrollListener!!)
-        }
-    }
-
-    /**
-     *
-     */
-    private fun removeEndlessScrollListener() {
-        if (recyclerView != null && endlessRecyclerViewScrollListener != null) {
-            recyclerView!!.removeOnScrollListener(endlessRecyclerViewScrollListener!!)
-        }
     }
 
     /**
