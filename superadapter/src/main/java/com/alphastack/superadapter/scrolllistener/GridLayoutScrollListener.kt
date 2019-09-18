@@ -1,11 +1,12 @@
 package com.alphastack.superadapter.scrolllistener
 
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.alphastack.superadapter.BaseRecyclerViewAdapter
 
 class GridLayoutScrollListener(
     private val layoutManager: GridLayoutManager,
-    private val adapter: BaseRecyclerViewAdapter<*, *>
+    private val adapter: RecyclerView.Adapter<*>
 ): BaseRecyclerViewScrollListener() {
 
     init {
@@ -13,7 +14,7 @@ class GridLayoutScrollListener(
     }
 
     override fun getTotalItemCount(): Int {
-        return adapter.getItems().size
+        return adapter.itemCount
     }
 
     override fun getLastVisibleItemPosition(): Int {

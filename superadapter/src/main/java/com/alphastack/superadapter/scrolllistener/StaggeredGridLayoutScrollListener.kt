@@ -1,11 +1,12 @@
 package com.alphastack.superadapter.scrolllistener
 
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.alphastack.superadapter.BaseRecyclerViewAdapter
 
 class StaggeredGridLayoutScrollListener(
     private val layoutManager: StaggeredGridLayoutManager,
-    private val adapter: BaseRecyclerViewAdapter<*, *>
+    private val adapter: RecyclerView.Adapter<*>
 ): BaseRecyclerViewScrollListener() {
 
     init {
@@ -13,7 +14,7 @@ class StaggeredGridLayoutScrollListener(
     }
 
     override fun getTotalItemCount(): Int {
-        return adapter.getItems().size
+        return adapter.itemCount
     }
 
     override fun getLastVisibleItemPosition(): Int {

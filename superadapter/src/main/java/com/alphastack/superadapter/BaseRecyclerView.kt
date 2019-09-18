@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.alphastack.superadapter.model.RecyclerViewItem
+import com.alphastack.superadapter.scrolllistener.BaseRecyclerViewScrollListener
 import com.alphastack.superadapter.viewholder.BaseViewHolder
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate", "unused")
@@ -52,10 +53,6 @@ abstract class BaseRecyclerView<ItemType : RecyclerViewItem>(
         recyclerView.visibility = View.GONE
 
         textViewDataNotFound.text = message
-    }
-
-    open fun setUpRecyclerView() {
-        // Override this method to setup
     }
 
     private fun resetInitialState() {
@@ -122,6 +119,7 @@ abstract class BaseRecyclerView<ItemType : RecyclerViewItem>(
 
     fun clear() {
         getAdapter().clearData()
+        getScrollListener()?.resetState()
         resetInitialState()
     }
 
@@ -130,4 +128,6 @@ abstract class BaseRecyclerView<ItemType : RecyclerViewItem>(
     abstract fun getAdapter(): BaseRecyclerViewAdapter<ItemType, out BaseViewHolder<ItemType>>
 
     abstract fun getDataNotFoundMessage(): String
+
+    abstract fun getScrollListener(): BaseRecyclerViewScrollListener?
 }
