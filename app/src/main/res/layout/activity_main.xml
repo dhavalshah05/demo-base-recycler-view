@@ -38,8 +38,8 @@
         app:layout_constraintStart_toEndOf="@id/buttonShowData"
         app:layout_constraintTop_toTopOf="@id/buttonShowData" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewLeagueList"
+    <FrameLayout
+        android:id="@+id/recyclerContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"

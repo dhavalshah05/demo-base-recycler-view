@@ -2,72 +2,46 @@ package com.alphastack.baserecyclerview
 
 import android.os.Bundle
 import android.os.Handler
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.alphastack.baserecyclerview.league.LeagueListAdapter
+import com.alphastack.baserecyclerview.league.LeagueListRecyclerView
 import com.alphastack.baserecyclerview.model.League
 import com.alphastack.superadapter.scrolllistener.LinearLayoutScrollListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var adapter: LeagueListAdapter
-    private lateinit var layoutManager: LinearLayoutManager
 
-    private lateinit var scrollListener: LinearLayoutScrollListener
-
-    var count = 0
+    private lateinit var leagueListRecyclerView: LeagueListRecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
 
-        adapter = LeagueListAdapter()
-        layoutManager = LinearLayoutManager(this)
-        scrollListener = LinearLayoutScrollListener(
-            layoutManager,
-            adapter
+        leagueListRecyclerView = LeagueListRecyclerView(
+                LayoutInflater.from(this),
+                recyclerContainer
         )
-        scrollListener.onLoadMore { page, totalItemCount, recyclerView ->
-            println("LOAD_MORE: Page($page), TotalItemCount($totalItemCount)")
-            adapter.showLoading()
-            Handler().postDelayed({
-                if(count == 0) {
-                    adapter.hideLoading()
-                    Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show()
-                    count++
-                } else {
-                    adapter.appendData(getLeagueList())
-                }
-            }, 3000)
-        }
-
-        setUpRecyclerViewLeagueList()
+        recyclerContainer.addView(leagueListRecyclerView.getRootView())
 
         buttonShowLoading.setOnClickListener {
-            adapter.showLoading()
+            leagueListRecyclerView.showLoading()
         }
 
         buttonShowData.setOnClickListener {
             val leagueList = getLeagueList()
-            adapter.replaceData(leagueList)
+            leagueListRecyclerView.replaceItems(leagueList)
         }
 
         buttonShowDataNotFound.setOnClickListener {
-            adapter.showDataNotFoundMessage("Data not found.")
+            leagueListRecyclerView.showMessage("Data not found.")
         }
 
-    }
-
-    private fun setUpRecyclerViewLeagueList() {
-        recyclerViewLeagueList.post {
-            recyclerViewLeagueList.layoutManager = layoutManager
-            recyclerViewLeagueList.adapter = adapter
-
-            recyclerViewLeagueList.addOnScrollListener(scrollListener)
-        }
     }
 
     private fun getLeagueList(): MutableList<League> {
