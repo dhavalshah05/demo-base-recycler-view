@@ -13,8 +13,8 @@ import com.alphastack.superadapter.viewholder.BaseViewHolder
 
 @Suppress("CanBeParameter", "MemberVisibilityCanBePrivate", "unused")
 abstract class BaseRecyclerView<ItemType : RecyclerViewItem>(
-        private val inflater: LayoutInflater,
-        private val parent: ViewGroup?
+    private val inflater: LayoutInflater,
+    private val parent: ViewGroup?
 ) {
 
     // RootView
@@ -44,13 +44,13 @@ abstract class BaseRecyclerView<ItemType : RecyclerViewItem>(
     fun showLoading() {
         progressBar.visibility = View.VISIBLE
         textViewDataNotFound.visibility = View.GONE
-        recyclerView.visibility = View.GONE
+        recyclerView.visibility = View.INVISIBLE
     }
 
     fun showMessage(message: String) {
         textViewDataNotFound.visibility = View.VISIBLE
         progressBar.visibility = View.GONE
-        recyclerView.visibility = View.GONE
+        recyclerView.visibility = View.INVISIBLE
 
         textViewDataNotFound.text = message
     }
@@ -58,7 +58,7 @@ abstract class BaseRecyclerView<ItemType : RecyclerViewItem>(
     private fun resetInitialState() {
         progressBar.visibility = View.GONE
         textViewDataNotFound.visibility = View.GONE
-        recyclerView.visibility = View.GONE
+        recyclerView.visibility = View.INVISIBLE
     }
 
     private fun showRecyclerView() {

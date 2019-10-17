@@ -57,7 +57,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     fun replaceItems(items: List<RecyclerViewItem>) {
         clearData()
         this.items.addAll(items)
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0, this.items.size)
     }
 
     /**
@@ -84,8 +84,10 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun clearData() {
+        //val previousItemListSize = this.items.size
         this.items.clear()
         notifyDataSetChanged()
+        //notifyItemRangeRemoved(0, previousItemListSize)
     }
 
     /**
