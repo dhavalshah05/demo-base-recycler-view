@@ -78,14 +78,14 @@ abstract class BaseRecyclerView<ItemType : RecyclerViewItem>(
         getAdapter().replaceItems(items)
     }
 
-    fun appendItems(items: List<RecyclerViewItem>) {
+    fun appendItemsAtStart(items: List<RecyclerViewItem>) {
         showRecyclerView()
-        getAdapter().appendItems(items)
+        getAdapter().appendItemsAtStart(items)
     }
 
-    fun appendItems(index: Int, items: List<RecyclerViewItem>) {
+    fun appendItemsAtEnd(items: List<RecyclerViewItem>) {
         showRecyclerView()
-        getAdapter().appendItems(index, items)
+        getAdapter().appendItemsAtEnd(items)
     }
 
     fun addItem(item: RecyclerViewItem) {

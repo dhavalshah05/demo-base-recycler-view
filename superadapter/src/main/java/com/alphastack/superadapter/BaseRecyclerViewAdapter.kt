@@ -2,122 +2,70 @@ package com.alphastack.superadapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import com.alphastack.superadapter.model.RecyclerViewItem
 import com.alphastack.superadapter.viewholder.BaseViewHolder
 import java.util.*
 
 abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseViewHolder<ItemType>> :
-    RecyclerView.Adapter<BaseViewHolder<*>>() {
-
+        ListAdapter<RecyclerViewItem, BaseViewHolder<*>>(RecyclerViewItemCallBack()) {
 
     /**
      * Holds items.
      */
     private val items = mutableListOf<RecyclerViewItem>()
 
-
-    private var recyclerViewHeight: Int = 0
-    private var recyclerViewWidth: Int = 0
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerViewHeight = recyclerView.height
-        this.recyclerViewWidth = recyclerView.width
-    }
-
-    /**
-     *
-     */
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
-    /**
-     *
-     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return getViewHolder(LayoutInflater.from(parent.context), parent, viewType)
     }
 
-    /**
-     *
-     */
     @Suppress("UNCHECKED_CAST")
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        val item = items[position] as ItemType
+        val item = getItem(position) as ItemType
         val viewHolder = holder as VH
         aboutToBindViewHolder(viewHolder, position)
         viewHolder.bind(item)
     }
 
-    /**
-     *
-     */
-    fun replaceItems(items: List<RecyclerViewItem>) {
-        clearData()
-        this.items.addAll(items)
-        notifyItemRangeChanged(0, this.items.size)
-    }
-
-    /**
-     *
-     */
-    fun appendItems(items: List<RecyclerViewItem>) {
-        val startIndex = itemCount
-        this.items.addAll(startIndex, items)
-        notifyItemRangeInserted(startIndex, items.size)
-    }
-
-
-    /**
-     *
-     */
-    fun appendItems(index: Int, items: List<RecyclerViewItem>) {
-        this.items.addAll(index, items)
-        notifyItemRangeInserted(index, items.size)
-    }
-
-
-    /**
-     *
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
     fun clearData() {
-        //val previousItemListSize = this.items.size
-        this.items.clear()
-        notifyDataSetChanged()
-        //notifyItemRangeRemoved(0, previousItemListSize)
+        items.clear()
+        submitList(items.toList())
     }
 
-    /**
-     *
-     */
+    fun replaceItems(newItems: List<RecyclerViewItem>) {
+        items.clear()
+        items.addAll(newItems)
+        submitList(items.toList())
+    }
+
+    fun appendItemsAtEnd(newItems: List<RecyclerViewItem>) {
+        items.addAll(newItems)
+        submitList(items.toList())
+    }
+
+    fun appendItemsAtStart(newItems: List<RecyclerViewItem>) {
+        items.addAll(0, newItems)
+        submitList(items.toList())
+    }
+
     fun addItem(item: RecyclerViewItem) {
-        val indexToInsert = itemCount
-        this.items.add(indexToInsert, item)
-        this.notifyItemInserted(indexToInsert)
+        items.add(item)
+        submitList(items.toList())
     }
 
-    /**
-     *
-     */
     fun removeItem(item: RecyclerViewItem) {
         val index = getItemIndex(item)
         if (index != -1) {
-            this.items.removeAt(index)
-            notifyItemRemoved(index)
+            items.removeAt(index)
+            submitList(items.toList())
         }
     }
 
-    /**
-     *
-     */
     fun updateItem(item: RecyclerViewItem) {
         val index = getItemIndex(item)
         if (index != -1) {
-            this.items[index] = item
-            notifyItemChanged(index)
+            items[index] = item
+            submitList(items.toList())
         }
     }
 
@@ -157,8 +105,9 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
         if (index < 0 || index > this.items.size - 1) {
             return null
         }
-        return this.items[index] as ItemType
+        return items[index] as ItemType
     }
+
 
     /**
      * If item is available in list, this will return index of that item.

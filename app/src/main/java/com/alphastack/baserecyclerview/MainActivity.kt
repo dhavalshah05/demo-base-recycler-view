@@ -22,7 +22,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         leagueListRecyclerView = LeagueListRecyclerView(
                 LayoutInflater.from(this),
                 recyclerContainer
@@ -39,7 +38,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonShowDataNotFound.setOnClickListener {
-            leagueListRecyclerView.showMessage("Data not found.")
+            //leagueListRecyclerView.showMessage("Data not found.")
+
+            val leagueList = mutableListOf<League>()
+
+            val league1 = League()
+            league1.id = 1
+            league1.name = "First League"
+
+            val league2 = League()
+            league2.id = 2
+            league2.name = "Second League"
+
+            leagueList.add(league1)
+            leagueList.add(league2)
+
+            leagueListRecyclerView.replaceItems(leagueList)
         }
 
     }
