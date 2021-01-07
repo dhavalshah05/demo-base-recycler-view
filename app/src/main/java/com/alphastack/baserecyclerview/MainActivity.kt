@@ -42,18 +42,21 @@ class MainActivity : AppCompatActivity() {
 
             val leagueList = mutableListOf<League>()
 
+            for (i in 1..10000 step 3) {
+                val league1 = League()
+                league1.id = i.toLong()
+                league1.name = "$i League"
+
+                leagueList.add(league1)
+            }
+
             val league1 = League()
-            league1.id = 1
-            league1.name = "First League"
+            league1.id = 120L
+            league1.name = "120 League"
 
-            val league2 = League()
-            league2.id = 2
-            league2.name = "Second League"
+            leagueListRecyclerView.removeItem(league1)
 
-            leagueList.add(league1)
-            leagueList.add(league2)
-
-            leagueListRecyclerView.replaceItems(leagueList)
+            //leagueListRecyclerView.appendItemsAtStart(leagueList)
         }
 
     }
@@ -61,43 +64,13 @@ class MainActivity : AppCompatActivity() {
     private fun getLeagueList(): MutableList<League> {
         val leagueList = mutableListOf<League>()
 
-        val league1 = League()
-        league1.id = 1
-        league1.name = "First League"
+        for (i in 1..10000 step 1) {
+            val league1 = League()
+            league1.id = i.toLong()
+            league1.name = "$i League"
 
-        val league2 = League()
-        league2.id = 2
-        league2.name = "Second League"
-
-        val league3 = League()
-        league3.id = 3
-        league3.name = "Third League"
-
-        val league4 = League()
-        league4.id = 4
-        league4.name = "Forth League"
-
-        val league5 = League()
-        league5.id = 5
-        league5.name = "Fifth League"
-
-        leagueList.add(league1)
-        leagueList.add(league2)
-        leagueList.add(league3)
-        leagueList.add(league4)
-        leagueList.add(league5)
-
-        leagueList.add(league1)
-        leagueList.add(league2)
-        leagueList.add(league3)
-        leagueList.add(league4)
-        leagueList.add(league5)
-
-        leagueList.add(league1)
-        leagueList.add(league2)
-        leagueList.add(league3)
-        leagueList.add(league4)
-        leagueList.add(league5)
+            leagueList.add(league1)
+        }
 
         return leagueList
     }

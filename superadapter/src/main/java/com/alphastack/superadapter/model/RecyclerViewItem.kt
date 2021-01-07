@@ -3,7 +3,12 @@ package com.alphastack.superadapter.model
 interface RecyclerViewItem {
     val itemId: String
 
-    fun isSameItem(newItem: RecyclerViewItem): Boolean
+    fun isSameItemAs(newItem: RecyclerViewItem): Boolean {
+        return itemId == newItem.itemId
+    }
 
-    fun isSameContent(newItem: RecyclerViewItem): Boolean
+    fun isSameContentAs(newItem: RecyclerViewItem): Boolean {
+        return this == newItem
+    }
+
 }
