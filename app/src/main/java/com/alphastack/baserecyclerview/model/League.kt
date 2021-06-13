@@ -2,7 +2,7 @@ package com.alphastack.baserecyclerview.model
 
 import com.alphastack.superadapter.model.RecyclerViewItem
 
-data class League(var id: Long? = null, var name: String? = null) : RecyclerViewItem {
+data class League(val id: Long, val name: String) : RecyclerViewItem {
     override val itemId: String
-        get() = id!!.toString()
+        get() = id.toString()
 }

@@ -10,9 +10,25 @@ import com.alphastack.superadapter.BaseRecyclerViewAdapter
 import com.alphastack.superadapter.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.league_list_item.view.*
 
-class LeagueListAdapter : BaseRecyclerViewAdapter<League, LeagueListAdapter.LeagueListItemViewHolder>() {
+class LeagueListAdapter :
+    BaseRecyclerViewAdapter<League, LeagueListAdapter.LeagueListItemViewHolder>() {
 
-    override fun getViewHolder(inflater: LayoutInflater, parent: ViewGroup, viewType: Int): LeagueListItemViewHolder {
+    private var onItemClick: ((League) -> Unit)? = null
+    private var onItemLongClick: ((League) -> Unit)? = null
+
+    fun onItemClicked(itemClick: (League) -> Unit) {
+        this.onItemClick = itemClick
+    }
+
+    fun onItemLongClicked(itemLongClick: (League) -> Unit) {
+        this.onItemLongClick = itemLongClick
+    }
+
+    override fun getViewHolder(
+        inflater: LayoutInflater,
+        parent: ViewGroup,
+        viewType: Int
+    ): LeagueListItemViewHolder {
         val view = inflater.inflate(R.layout.league_list_item, parent, false)
         return LeagueListItemViewHolder(view)
     }
@@ -34,7 +50,21 @@ class LeagueListAdapter : BaseRecyclerViewAdapter<League, LeagueListAdapter.Leag
 
 
     inner class LeagueListItemViewHolder(view: View) : BaseViewHolder<League>(view) {
+
+        private lateinit var item: League
+
+        init {
+            itemView.setOnClickListener {
+                onItemClick?.invoke(item)
+            }
+            itemView.setOnLongClickListener {
+                onItemLongClick?.invoke(item)
+                true
+            }
+        }
+
         override fun bind(item: League) {
+            this.item = item
             itemView.textViewLeagueName.text = item.name
         }
     }

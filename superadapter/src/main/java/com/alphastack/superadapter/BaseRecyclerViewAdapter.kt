@@ -8,12 +8,7 @@ import com.alphastack.superadapter.viewholder.BaseViewHolder
 import java.util.*
 
 abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseViewHolder<ItemType>> :
-        ListAdapter<RecyclerViewItem, BaseViewHolder<*>>(RecyclerViewItemCallBack()) {
-
-    /**
-     * Holds items.
-     */
-    private val items = mutableListOf<RecyclerViewItem>()
+    ListAdapter<RecyclerViewItem, BaseViewHolder<*>>(RecyclerViewItemCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return getViewHolder(LayoutInflater.from(parent.context), parent, viewType)
@@ -28,44 +23,46 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     }
 
     fun clearData() {
-        items.clear()
-        submitList(items.toList())
+        submitList(listOf())
     }
 
     fun replaceItems(newItems: List<RecyclerViewItem>) {
-        items.clear()
-        items.addAll(newItems)
-        submitList(items.toList())
+        submitList(newItems)
     }
 
     fun appendItemsAtEnd(newItems: List<RecyclerViewItem>) {
-        items.addAll(newItems)
-        submitList(items.toList())
+        val dataList = currentList.toMutableList()
+        dataList.addAll(newItems)
+        submitList(dataList.toList())
     }
 
     fun appendItemsAtStart(newItems: List<RecyclerViewItem>) {
-        items.addAll(0, newItems)
-        submitList(items.toList())
+        val dataList = currentList.toMutableList()
+        dataList.addAll(0, newItems)
+        submitList(dataList.toList())
     }
 
     fun addItem(item: RecyclerViewItem) {
-        items.add(item)
-        submitList(items.toList())
+        val dataList = currentList.toMutableList()
+        dataList.add(item)
+        submitList(dataList.toList())
     }
 
     fun removeItem(item: RecyclerViewItem) {
         val index = getItemIndex(item)
         if (index != -1) {
-            items.removeAt(index)
-            submitList(items.toList())
+            val dataList = currentList.toMutableList()
+            dataList.removeAt(index)
+            submitList(dataList.toList())
         }
     }
 
     fun updateItem(item: RecyclerViewItem) {
         val index = getItemIndex(item)
         if (index != -1) {
-            items[index] = item
-            submitList(items.toList())
+            val dataList = currentList.toMutableList()
+            dataList[index] = item
+            submitList(dataList.toList())
         }
     }
 
@@ -75,7 +72,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     @Suppress("UNCHECKED_CAST")
     fun getItems(): List<ItemType> {
         val items = mutableListOf<ItemType>()
-        this.items.map { items.add(it as ItemType) }
+        this.currentList.map { items.add(it as ItemType) }
         return Collections.unmodifiableList(items)
     }
 
@@ -86,7 +83,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     fun getItemById(id: String): ItemType? {
         var item: ItemType? = null
 
-        for (obj in items) {
+        for (obj in currentList) {
             if (obj.itemId == id) {
                 item = obj as ItemType
                 break
@@ -102,10 +99,10 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
     fun getItemByIndex(index: Int): ItemType? {
         // Return null if index is out of bound
-        if (index < 0 || index > this.items.size - 1) {
+        if (index < 0 || index > this.currentList.size - 1) {
             return null
         }
-        return items[index] as ItemType
+        return currentList[index] as ItemType
     }
 
 
@@ -116,7 +113,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     private fun getItemIndex(item: RecyclerViewItem): Int {
         var resultIndex = -1
 
-        for ((index, obj) in items.withIndex()) {
+        for ((index, obj) in currentList.withIndex()) {
             if (obj.itemId == item.itemId) {
                 resultIndex = index
                 break
