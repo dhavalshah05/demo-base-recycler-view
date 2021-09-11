@@ -2,7 +2,6 @@ package com.alphastack.superadapter.scrolllistener
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.alphastack.superadapter.BaseRecyclerViewAdapter
 
 class StaggeredGridLayoutScrollListener(
     private val layoutManager: StaggeredGridLayoutManager,

@@ -7,9 +7,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.alphastack.superadapter.model.RecyclerViewItem
 
-abstract class BaseViewHolder<ItemType : RecyclerViewItem>(view: View) : RecyclerView.ViewHolder(view) {
+abstract class BaseViewHolder<ItemType>(view: View) : RecyclerView.ViewHolder(view) {
 
     /**
      *

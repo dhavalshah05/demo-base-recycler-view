@@ -2,7 +2,6 @@ package com.alphastack.superadapter.scrolllistener
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.alphastack.superadapter.BaseRecyclerViewAdapter
 
 class LinearLayoutScrollListener(
         private val layoutManager: LinearLayoutManager,

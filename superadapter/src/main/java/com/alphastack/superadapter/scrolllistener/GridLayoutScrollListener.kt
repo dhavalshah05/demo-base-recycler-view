@@ -2,7 +2,6 @@ package com.alphastack.superadapter.scrolllistener
 
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.alphastack.superadapter.BaseRecyclerViewAdapter
 
 class GridLayoutScrollListener(
     private val layoutManager: GridLayoutManager,

@@ -3,28 +3,16 @@ package com.alphastack.superadapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.alphastack.superadapter.model.RecyclerViewItem
 import com.alphastack.superadapter.viewholder.BaseViewHolder
 import java.util.*
 
-abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseViewHolder<ItemType>> :
-    RecyclerView.Adapter<BaseViewHolder<*>>() {
-
+abstract class BaseRecyclerViewAdapter<ItemType, VH : BaseViewHolder<ItemType>> :
+    RecyclerView.Adapter<BaseViewHolder<ItemType>>() {
 
     /**
      * Holds items.
      */
-    private val items = mutableListOf<RecyclerViewItem>()
-
-
-    private var recyclerViewHeight: Int = 0
-    private var recyclerViewWidth: Int = 0
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerViewHeight = recyclerView.height
-        this.recyclerViewWidth = recyclerView.width
-    }
+    private val items = mutableListOf<ItemType>()
 
     /**
      *
@@ -36,7 +24,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<ItemType> {
         return getViewHolder(LayoutInflater.from(parent.context), parent, viewType)
     }
 
@@ -44,8 +32,8 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
      *
      */
     @Suppress("UNCHECKED_CAST")
-    override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        val item = items[position] as ItemType
+    override fun onBindViewHolder(holder: BaseViewHolder<ItemType>, position: Int) {
+        val item = items[position]
         val viewHolder = holder as VH
         aboutToBindViewHolder(viewHolder, position)
         viewHolder.bind(item)
@@ -54,7 +42,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    fun replaceItems(items: List<RecyclerViewItem>) {
+    fun replaceItems(items: List<ItemType>) {
         clearData()
         this.items.addAll(items)
         notifyItemRangeChanged(0, this.items.size)
@@ -63,7 +51,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    fun appendItems(items: List<RecyclerViewItem>) {
+    fun appendItemsAtEnd(items: List<ItemType>) {
         val startIndex = itemCount
         this.items.addAll(startIndex, items)
         notifyItemRangeInserted(startIndex, items.size)
@@ -73,7 +61,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    fun appendItems(index: Int, items: List<RecyclerViewItem>) {
+    fun appendItemsAt(index: Int, items: List<ItemType>) {
         this.items.addAll(index, items)
         notifyItemRangeInserted(index, items.size)
     }
@@ -84,16 +72,14 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun clearData() {
-        //val previousItemListSize = this.items.size
         this.items.clear()
         notifyDataSetChanged()
-        //notifyItemRangeRemoved(0, previousItemListSize)
     }
 
     /**
      *
      */
-    fun addItem(item: RecyclerViewItem) {
+    fun addItem(item: ItemType) {
         val indexToInsert = itemCount
         this.items.add(indexToInsert, item)
         this.notifyItemInserted(indexToInsert)
@@ -102,8 +88,8 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    fun removeItem(item: RecyclerViewItem) {
-        val index = getItemIndex(item)
+    fun removeItem(item: ItemType, predicate: (ItemType) -> Boolean) {
+        val index = items.indexOfFirst(predicate)
         if (index != -1) {
             this.items.removeAt(index)
             notifyItemRemoved(index)
@@ -113,8 +99,8 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
     /**
      *
      */
-    fun updateItem(item: RecyclerViewItem) {
-        val index = getItemIndex(item)
+    fun updateItem(item: ItemType, predicate: (ItemType) -> Boolean) {
+        val index = items.indexOfFirst(predicate)
         if (index != -1) {
             this.items[index] = item
             notifyItemChanged(index)
@@ -126,26 +112,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
      */
     @Suppress("UNCHECKED_CAST")
     fun getItems(): List<ItemType> {
-        val items = mutableListOf<ItemType>()
-        this.items.map { items.add(it as ItemType) }
         return Collections.unmodifiableList(items)
-    }
-
-    /**
-     *
-     */
-    @Suppress("UNCHECKED_CAST")
-    fun getItemById(id: String): ItemType? {
-        var item: ItemType? = null
-
-        for (obj in items) {
-            if (obj.itemId == id) {
-                item = obj as ItemType
-                break
-            }
-        }
-
-        return item
     }
 
     /**
@@ -157,24 +124,7 @@ abstract class BaseRecyclerViewAdapter<ItemType : RecyclerViewItem, VH : BaseVie
         if (index < 0 || index > this.items.size - 1) {
             return null
         }
-        return this.items[index] as ItemType
-    }
-
-    /**
-     * If item is available in list, this will return index of that item.
-     * Else it will return -1.
-     */
-    private fun getItemIndex(item: RecyclerViewItem): Int {
-        var resultIndex = -1
-
-        for ((index, obj) in items.withIndex()) {
-            if (obj.itemId == item.itemId) {
-                resultIndex = index
-                break
-            }
-        }
-
-        return resultIndex
+        return this.items[index]
     }
 
 

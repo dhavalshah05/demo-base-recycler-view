@@ -1,45 +1,45 @@
 package com.alphastack.baserecyclerview
 
 import android.os.Bundle
-import android.os.Handler
-import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.alphastack.baserecyclerview.league.LeagueListAdapter
-import com.alphastack.baserecyclerview.league.LeagueListRecyclerView
 import com.alphastack.baserecyclerview.model.League
 import com.alphastack.superadapter.scrolllistener.LinearLayoutScrollListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-
-    private lateinit var leagueListRecyclerView: LeagueListRecyclerView
+    private val adapter by lazy {
+        LeagueListAdapter()
+    }
+    private val layoutManager by lazy {
+        LinearLayoutManager(this)
+    }
+    private val scrollListener by lazy {  LinearLayoutScrollListener(layoutManager, adapter) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        leagueListRecyclerView = LeagueListRecyclerView(
-                LayoutInflater.from(this),
-                recyclerContainer
-        )
-        recyclerContainer.addView(leagueListRecyclerView.getRootView())
+        recyclerContainer.layoutManager = layoutManager
+        recyclerContainer.adapter = adapter
+        recyclerContainer.addOnScrollListener(scrollListener)
+        scrollListener.onLoadMore { page, totalItemCount, recyclerView ->
+            println("ON_LOAD_MORE $page")
+        }
 
         buttonShowLoading.setOnClickListener {
-            leagueListRecyclerView.showLoading()
         }
 
         buttonShowData.setOnClickListener {
             val leagueList = getLeagueList()
-            leagueListRecyclerView.replaceItems(leagueList)
+            adapter.replaceItems(leagueList)
         }
 
         buttonShowDataNotFound.setOnClickListener {
-            leagueListRecyclerView.showMessage("Data not found.")
+            val item = adapter.getItems()[4]
+            adapter.removeItem(item) { it.id == item.id }
         }
 
     }

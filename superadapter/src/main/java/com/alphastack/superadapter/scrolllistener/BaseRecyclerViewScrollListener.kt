@@ -20,7 +20,7 @@ abstract class BaseRecyclerViewScrollListener : RecyclerView.OnScrollListener() 
 
     private var loadMore: ((Int, Int, RecyclerView) -> Unit)? = null
 
-    fun onLoadMore(loadMore: (Int, Int, RecyclerView) -> Unit) {
+    fun onLoadMore(loadMore: (page: Int, totalItemCount: Int, recyclerView: RecyclerView) -> Unit) {
         this.loadMore = loadMore
     }
 
