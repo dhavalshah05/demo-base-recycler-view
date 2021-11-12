@@ -20,7 +20,7 @@ class StaggeredGridLayoutScrollListener(
         val lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(null)
 
         var maxSize = 0
-        for(position in lastVisibleItemPositions) {
+        for(position in lastVisibleItemPositions.indices) {
             if(position == 0) {
                 maxSize = lastVisibleItemPositions[position]
             } else if(lastVisibleItemPositions[position] > maxSize) {
