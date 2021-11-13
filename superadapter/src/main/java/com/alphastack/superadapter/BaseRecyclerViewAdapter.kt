@@ -103,7 +103,7 @@ abstract class BaseRecyclerViewAdapter<ItemType, VH : BaseViewHolder<ItemType>> 
         val index = items.indexOfFirst(predicate)
         if (index != -1) {
             this.items[index] = item
-            notifyItemChanged(index)
+            notifyItemChanged(index, item)
         }
     }
 
