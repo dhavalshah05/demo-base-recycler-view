@@ -5,29 +5,43 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alphastack.baserecyclerview.league.LeagueListAdapter
 import com.alphastack.baserecyclerview.model.League
+import com.alphastack.superadapter.scrolllistener.LinearLayoutScrollListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var adapter: LeagueListAdapter
-    private lateinit var layoutManager: LinearLayoutManager
+    private val adapter by lazy {
+        LeagueListAdapter()
+    }
+    private val layoutManager by lazy {
+        LinearLayoutManager(this)
+    }
+    private val scrollListener by lazy {  LinearLayoutScrollListener(layoutManager, adapter) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        adapter = LeagueListAdapter()
-        layoutManager = LinearLayoutManager(this)
-        setUpRecyclerViewLeagueList()
+        recyclerContainer.layoutManager = layoutManager
+        recyclerContainer.adapter = adapter
+        recyclerContainer.addOnScrollListener(scrollListener)
+        scrollListener.onLoadMore { page, totalItemCount, recyclerView ->
+            println("ON_LOAD_MORE $page")
+        }
 
-        val leagueList = getLeagueList()
-        adapter.replaceData(leagueList)
-        //adapter.showDataNotFoundMessage("Data not found.")
-    }
+        buttonShowLoading.setOnClickListener {
+        }
 
-    private fun setUpRecyclerViewLeagueList() {
-        recyclerViewLeagueList.layoutManager = layoutManager
-        recyclerViewLeagueList.adapter = adapter
+        buttonShowData.setOnClickListener {
+            val leagueList = getLeagueList()
+            adapter.replaceItems(leagueList)
+        }
+
+        buttonShowDataNotFound.setOnClickListener {
+            val item = adapter.getItems()[4]
+            adapter.removeItem(item) { it.id == item.id }
+        }
+
     }
 
     private fun getLeagueList(): MutableList<League> {
@@ -52,12 +66,6 @@ class MainActivity : AppCompatActivity() {
         val league5 = League()
         league5.id = 5
         league5.name = "Fifth League"
-
-        leagueList.add(league1)
-        leagueList.add(league2)
-        leagueList.add(league3)
-        leagueList.add(league4)
-        leagueList.add(league5)
 
         leagueList.add(league1)
         leagueList.add(league2)

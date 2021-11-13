@@ -6,13 +6,46 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonShowLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Loading"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@id/buttonShowData"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonShowData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Data"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/buttonShowLoading"
+        app:layout_constraintEnd_toStartOf="@id/buttonShowDataNotFound"
+        app:layout_constraintStart_toEndOf="@id/buttonShowLoading"
+        app:layout_constraintTop_toTopOf="@id/buttonShowLoading" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonShowDataNotFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Data Not Found"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/buttonShowData"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonShowData"
+        app:layout_constraintTop_toTopOf="@id/buttonShowData" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewLeagueList"
+        android:id="@+id/recyclerContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonShowLoading" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
